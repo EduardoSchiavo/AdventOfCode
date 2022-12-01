@@ -1,4 +1,4 @@
-const {readFileSync, promises: fsPromises} = require('fs');
+const {readFileSync} = require('fs');
 
 fileName="examples/example1.txt"
 
