@@ -23,8 +23,7 @@ def calculate_score(game: str)-> int:
             return result[1] + 6
     elif result[0] > result[1]:          #LOOSE
             return result[1]
-    else:                                #WIN
-        return result[1] + 6
+    return result[1] + 6    # WIN
     
 
 def calculate_score_p2(game: str)-> int:    
