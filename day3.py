@@ -5,11 +5,7 @@ with open('examples/example3.txt') as ifile:
 RUCKSACKS=[list(rucksack) for rucksack in inp]
 
 def get_common_types(rucksacks: list)-> list:
-    letters_in_common=[]
-    for rucksack in rucksacks:        
-        mid_point=len(rucksack)//2
-        letters_in_common.append([letter for letter in rucksack[:mid_point] if letter in rucksack[mid_point:]][0])
-    return letters_in_common
+    return [[letter for letter in rucksack[:len(rucksack)//2] if letter in rucksack[len(rucksack)//2:]][0] for rucksack in rucksacks]
 
 def part_1(rucksacks):
     common = get_common_types(rucksacks)
@@ -18,8 +14,12 @@ def part_1(rucksacks):
 def calculate_score(common):
     return sum([ord(letter)-(96-58*letter.isupper()) for letter in common])
 
+# def get_intersection(group_of_elves: list[list])-> list:
+#     return [letter for letter in group_of_elves[0] if letter in group_of_elves[1] and letter in group_of_elves[2]][0]
+
 def get_intersection(group_of_elves: list[list])-> list:
-    return [letter for letter in group_of_elves[0] if letter in group_of_elves[1] and letter in group_of_elves[2]][0]
+    return list(set(group_of_elves[0]) & set(group_of_elves[1]) & set(group_of_elves[2]))[0]
+
 
 def part_2(rucksacks):
     common=[]
