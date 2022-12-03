@@ -11,20 +11,22 @@ def get_common_types(rucksacks: list)-> list:
         letters_in_common.append([letter for letter in rucksack[:mid_point] if letter in rucksack[mid_point:]][0])
     return letters_in_common
 
-COMMON = get_common_types(RUCKSACKS)
+def part_1(rucksacks):
+    common = get_common_types(rucksacks)
+    return calculate_score(common)
 
-def part_1(common):
+def calculate_score(common):
     return sum([ord(letter)-(96-58*letter.isupper()) for letter in common])
 
-intersection_a_b = get_common_types(RUCKSACKS[:2])
-print(intersection_a_b)
+def get_intersection(group_of_elves: list[list])-> list:
+    return [letter for letter in group_of_elves[0] if letter in group_of_elves[1] and letter in group_of_elves[2]][0]
 
-intesection_b_c= get_common_types(RUCKSACKS[1:2])
+def part_2(rucksacks):
+    common=[]
+    for i in range(0, len(rucksacks), 3):
+        common.append(get_intersection(rucksacks[i:i+3]))
+    return calculate_score(common)
 
-result=get_common_types([intersection_a_b, intesection_b_c])
+print("part one: ", part_1(RUCKSACKS))
 
-print(intesection_b_c)
-
-# print(part_1(COMMON))
-
-
+print("part two:", part_2(RUCKSACKS))
