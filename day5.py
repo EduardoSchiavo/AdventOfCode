@@ -26,18 +26,15 @@ def parse_move(move: str)-> tuple:
     exp=re.compile(r"move (\d*) from (\d*) to (\d*)")
     return exp.search(move).group(1, 2, 3)
 
-def execute_move(piles_of_crates: dict, quantity: str, starting_pile: str, destination: str, element_wise=False)-> None:
-    if element_wise:
-        piles_of_crates[destination].extend(reversed(piles_of_crates[starting_pile][-int(quantity):]))
-    else:
-        piles_of_crates[destination].extend(piles_of_crates[starting_pile][-int(quantity):])
+def execute_move(piles_of_crates: dict, quantity: str, starting_pile: str, destination: str, direction=1)-> None:
+    piles_of_crates[destination].extend(piles_of_crates[starting_pile][-int(quantity):][::-1*direction])
     piles_of_crates[starting_pile]=piles_of_crates[starting_pile][:-int(quantity)]
     return piles_of_crates
 
-def shift_crates(list_of_instructions:list, piles_of_crates: dict, element_wise=False)-> dict:
+def shift_crates(list_of_instructions:list, piles_of_crates: dict, direction=1)-> dict:
     for instruction in list_of_instructions:
         piles_of_crates = execute_move(
-            piles_of_crates, *parse_move(instruction), element_wise
+            piles_of_crates, *parse_move(instruction), direction
         )
     return piles_of_crates
 
@@ -48,15 +45,13 @@ def solution(piles_of_crate: dict)-> str:
 def part_1(piles, moves):
     crates_dict=parse_piles(piles)
     print(crates_dict)
-    return solution(shift_crates(moves, crates_dict, element_wise=True))
+    return solution(shift_crates(moves, crates_dict))
 
 def part_2(piles, moves):
     crates_dict=parse_piles(piles)
-    return solution(shift_crates(moves, crates_dict, element_wise=False))
+    return solution(shift_crates(moves, crates_dict, direction=-1))
 
 
 print(part_1(PILES, MOVES))
 
 print(part_2(PILES, MOVES))
-
-
