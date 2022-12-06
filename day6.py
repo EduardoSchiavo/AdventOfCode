@@ -5,25 +5,21 @@ example6="mjqjpqmgbljsphdztnvjfqwrcgsmlb"
 
 # print(INPUT)
 
-def is_packet_marker(charachters: str)-> bool:
-    return charachters[0] not in charachters[1:] and charachters[1] not in charachters[2:] and charachters[2] != charachters[3]
+def is_marker(characters:str)-> bool:
+    return not len(characters) != len(set(characters))
 
-def is_message_marker(charachters: str)-> bool:
-    return all([charachters[i] not in charachters[i+1:] for i in range(len(charachters))])
-
-
-def get_position_after_marker(datastream: str)-> int:
-    for i in range(len(datastream)-4):
-        if is_packet_marker(datastream[i:i+4]):
-            return i+4
-
-def get_position_after_message_marker(datastream: str)-> int:
-    for i in range(len(datastream)-14):
-        # print(datastream[i:i+14])
-        if is_message_marker(datastream[i:i+14]):
-            return i+14
+def get_position_after_marker(datastream: str, marker_size: int)-> int:
+    for i in range(len(datastream)-marker_size):
+        if is_marker(datastream[i:i+marker_size]):
+            return i+marker_size
 
 
+def part_1(datastream: str):
+    return get_position_after_marker(datastream, 4)
 
+def part_2(datastream: str):
+    return get_position_after_marker(datastream, 14)
 
-print(get_position_after_message_marker(INPUT))
+print("Solution to p1: ", part_1(INPUT))
+print("Solution to p2: ", part_2(INPUT))
+
