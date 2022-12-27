@@ -4,7 +4,7 @@ with open("inputs/input6.txt") as ifile:
 example6="mjqjpqmgbljsphdztnvjfqwrcgsmlb"
 
 def is_marker(characters:str)-> bool:
-    return not len(characters) != len(set(characters))
+    return  len(characters) == len(set(characters))
 
 def get_position_after_marker(datastream: str, marker_size: int)-> int:
     for i in range(len(datastream)-marker_size):
