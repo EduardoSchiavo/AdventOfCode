@@ -1,6 +1,7 @@
 import numpy as np
+from functools import reduce
 
-with open("examples/example8.txt") as ifile:
+with open("inputs/input8.txt") as ifile:
     INP=[[int(n) for n in line] for line in ifile.read().splitlines()]
 
 
@@ -56,27 +57,24 @@ def get_positions(array):
 def compute_view(array: list[list], point: tuple)-> int:
     row, col= point
     array = np.array(array)
-    right_view=0
-    left_view=0
-    top_view=0
-    bottom_view=0
+    views=[0, 0, 0, 0]
     for tree in array[row,col+1:]:
-        right_view+=1
+        views[0]+=1
         if tree>=array[row,col]:
             break
     for tree in array[row,col-1::-1]:
-        left_view+=1
+        views[1]+=1
         if tree>=array[row,col]:
             break
     for tree in array[row+1:,col]:
-        bottom_view+=1
+        views[2]+=1
         if tree>=array[row,col]:
             break
     for tree in array[row-1::-1,col]:
-        top_view+=1
+        views[3]+=1
         if tree>=array[row,col]:
             break
-    return right_view*left_view*bottom_view*top_view
+    return reduce(lambda x, y: x*y, views)
 
 def compute_views(marked_array: list[list]) -> int:
     return max([compute_view(marked_array, point) for point in get_positions(marked_array)])
