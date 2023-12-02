@@ -1,4 +1,3 @@
-from collections import defaultdict
 import math
 import re
 
@@ -39,5 +38,4 @@ def p2(input: list)-> int:
         
 
 print(p1(INP)) #3099
-
 print(p2(INP))  #72970
