@@ -43,45 +43,19 @@ def collect_number_and_blacklist_indices(num_coordinates: tuple, schematic: list
     return part_number
 
 
-
-# single point
 def search_symbol_surroundings(symbol_coordinates: tuple, schematic: list[list]):
     x, y = symbol_coordinates
+    modifiers = [(1,0), (0, 1), (-1, 0), (0, -1), (1, 1), (-1, -1), (1, -1), (-1, 1)]
     part_numbers = []
-    if schematic[x-1][y].isnumeric():  #TODO turn ifs into a loop
-        # print(schematic[x-1][y])
-        if not is_blacklisted((x-1, y)):
-            part_numbers.append(collect_number_and_blacklist_indices((x-1, y), schematic))
-    if schematic[x+1][y].isnumeric():
-        # print(schematic[x+1][y])
-        if not is_blacklisted((x+1, y)):
-            part_numbers.append(collect_number_and_blacklist_indices((x+1, y), schematic))
-    if schematic[x][y-1].isnumeric():
-        # print(schematic[x][y-1])
-        if not is_blacklisted((x, y-1)):
-            part_numbers.append(collect_number_and_blacklist_indices((x, y-1), schematic))
-    if schematic[x][y+1].isnumeric():
-        # print(schematic[x][y+1])
-        if not is_blacklisted((x, y+1)):
-            part_numbers.append(collect_number_and_blacklist_indices((x, y+1), schematic))    
-    if schematic[x+1][y+1].isnumeric():
-        # print(schematic[x+1][y+1])
-        if not is_blacklisted((x+1, y+1)):
-            part_numbers.append(collect_number_and_blacklist_indices((x+1, y+1), schematic))
-    if schematic[x-1][y-1].isnumeric():
-        # print(schematic[x-1][y-1])
-        if not is_blacklisted((x-1, y-1)):
-            part_numbers.append(collect_number_and_blacklist_indices((x-1, y-1), schematic))
-    if schematic[x+1][y-1].isnumeric():
-        # print(schematic[x+1][y-1])
-        if not is_blacklisted((x+1, y-1)):
-            part_numbers.append(collect_number_and_blacklist_indices((x+1, y-1), schematic))
-    if schematic[x-1][y+1].isnumeric():
-        # print(schematic[x-1][y+1])
-        if not is_blacklisted((x-1, y+1)):
-            part_numbers.append(collect_number_and_blacklist_indices((x-1, y+1), schematic))
+    for mod in modifiers:
+        print(mod)
+        a = x+mod[0]
+        b = y+mod[1]        
+        if schematic[a][b].isnumeric():  #TODO turn ifs into a loop
+            print(schematic[a][b])
+            if not is_blacklisted((a, b)):
+                part_numbers.append(collect_number_and_blacklist_indices((a, b), schematic))
     return part_numbers
-    
 
 def collect_all_part_numbers(schematic: list[list]):
     indices = get_symbol_indices(schematic)
@@ -104,5 +78,5 @@ def p1():
 
 # print(collect_number_and_blacklist_indices((0, 1), INP))
 
-print(p1())
+print(p1()) #543867
 
