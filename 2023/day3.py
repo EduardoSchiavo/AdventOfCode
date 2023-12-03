@@ -1,7 +1,9 @@
+import math
+
+
 with open('inputs/input3.txt') as ifile:
     INP=[list(line) for line in ifile.read().splitlines()]
 
-print(INP)
 
 UNALLOWED_SYMBOLS = ".1234567890"
 
@@ -12,7 +14,6 @@ def get_symbol_indices(schematic: list[list])-> list:
     for r_idx, row in enumerate(schematic):
         for c_idx, element in enumerate(row):
             if element not in  UNALLOWED_SYMBOLS:
-                print(element, (r_idx, c_idx))
                 symbol_indices.append((r_idx, c_idx))
     return symbol_indices
 
@@ -27,7 +28,6 @@ def collect_number_and_blacklist_indices(num_coordinates: tuple, schematic: list
     part_number = schematic[x][y]
     blacklist_coordinates(num_coordinates)
     i = 1
-
     while schematic[x][y-i].isnumeric() and y-1 >= 0:
         part_number = schematic[x][y-i] + part_number
         blacklist_coordinates((x, y-i))
@@ -48,11 +48,11 @@ def search_symbol_surroundings(symbol_coordinates: tuple, schematic: list[list])
     modifiers = [(1,0), (0, 1), (-1, 0), (0, -1), (1, 1), (-1, -1), (1, -1), (-1, 1)]
     part_numbers = []
     for mod in modifiers:
-        print(mod)
+        # print(mod)
         a = x+mod[0]
         b = y+mod[1]        
         if schematic[a][b].isnumeric():  #TODO turn ifs into a loop
-            print(schematic[a][b])
+            # print(schematic[a][b])
             if not is_blacklisted((a, b)):
                 part_numbers.append(collect_number_and_blacklist_indices((a, b), schematic))
     return part_numbers
@@ -62,13 +62,40 @@ def collect_all_part_numbers(schematic: list[list]):
     part_nums = []
     for index in indices:
         part_nums.extend(search_symbol_surroundings(index, schematic))
-    print(BLACKLIST)
     return part_nums
+
+
+
+def collect_stars(schematic: list[list])-> list: #TODO fix code duplication
+    symbol_indices=[]
+    for r_idx, row in enumerate(schematic):
+        for c_idx, element in enumerate(row):
+            if element == '*':
+                # print(element, (r_idx, c_idx))
+                symbol_indices.append((r_idx, c_idx))
+    return symbol_indices
+
+def collect_all_gears(schematic: list[list]):
+    indices = collect_stars(schematic)
+    ratios = []
+    for index in indices:
+        part_nums = search_symbol_surroundings(index, schematic)
+        # print(part_nums)
+        if len(part_nums) != 2:
+            continue
+        gear_ratio = math.prod([int (num) for num in part_nums])
+        ratios.append(gear_ratio)
+    return sum(ratios)
+
+
 
 def p1():
     return sum([int(num) for num in collect_all_part_numbers(INP)])
 
 
+
+def p2():
+    return collect_all_gears(INP)
 
 
 # indices = get_symbol_indices(INP)
@@ -78,5 +105,7 @@ def p1():
 
 # print(collect_number_and_blacklist_indices((0, 1), INP))
 
-print(p1()) #543867
+# print(p1()) #543867
+
+print(p2()) #
 
