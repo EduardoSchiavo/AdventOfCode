@@ -38,8 +38,8 @@ def collect_number_and_blacklist_indices(num_coordinates: tuple, schematic: list
             part_number = part_number + schematic[x][y+i]
             blacklist_coordinates((x, y+i))
             i += 1
-    except IndexError:
-        print("reaching array edge")
+    except IndexError: # reaching array edge
+        pass
     return part_number
 
 
@@ -48,11 +48,9 @@ def search_symbol_surroundings(symbol_coordinates: tuple, schematic: list[list])
     modifiers = [(1,0), (0, 1), (-1, 0), (0, -1), (1, 1), (-1, -1), (1, -1), (-1, 1)]
     part_numbers = []
     for mod in modifiers:
-        # print(mod)
         a = x+mod[0]
         b = y+mod[1]        
-        if schematic[a][b].isnumeric():  #TODO turn ifs into a loop
-            # print(schematic[a][b])
+        if schematic[a][b].isnumeric(): 
             if not is_blacklisted((a, b)):
                 part_numbers.append(collect_number_and_blacklist_indices((a, b), schematic))
     return part_numbers
@@ -66,21 +64,19 @@ def collect_all_part_numbers(schematic: list[list]):
 
 
 
-def collect_stars(schematic: list[list])-> list: #TODO fix code duplication
+def get_star_indices(schematic: list[list])-> list: #TODO fix code duplication
     symbol_indices=[]
     for r_idx, row in enumerate(schematic):
         for c_idx, element in enumerate(row):
             if element == '*':
-                # print(element, (r_idx, c_idx))
                 symbol_indices.append((r_idx, c_idx))
     return symbol_indices
 
 def collect_all_gears(schematic: list[list]):
-    indices = collect_stars(schematic)
+    indices = get_star_indices(schematic)
     ratios = []
     for index in indices:
         part_nums = search_symbol_surroundings(index, schematic)
-        # print(part_nums)
         if len(part_nums) != 2:
             continue
         gear_ratio = math.prod([int (num) for num in part_nums])
@@ -88,24 +84,17 @@ def collect_all_gears(schematic: list[list]):
     return sum(ratios)
 
 
-
 def p1():
     return sum([int(num) for num in collect_all_part_numbers(INP)])
-
 
 
 def p2():
     return collect_all_gears(INP)
 
 
-# indices = get_symbol_indices(INP)
 
-# print(search_symbol_surroundings(indices[5], INP))
-# print(BLACKLIST)
 
-# print(collect_number_and_blacklist_indices((0, 1), INP))
-
-# print(p1()) #543867
-
-print(p2()) #
+print(p1()) #543867
+BLACKLIST = []
+print(p2()) #79613331
 
