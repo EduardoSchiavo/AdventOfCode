@@ -33,11 +33,6 @@ def p2():
     return sum([v[1] for v in cards_dict.values()])
 
 
-
-
-
-
-
 def p1():
     total =0
     for card in INP:
