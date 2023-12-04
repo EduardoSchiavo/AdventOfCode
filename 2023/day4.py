@@ -17,11 +17,40 @@ def evaluate_card(card: str)-> list:
     scratched_numbers = parse_number_sequence(card.split('|')[1].split(' '))
     return [num for num in scratched_numbers if num in winning_numbers]
 
+def to_dict(cards: list)-> dict:
+    return {idx+1: [card, 1] for (idx, card) in enumerate(cards)}
+
+
+cards_dict = to_dict(INP)
+
+for idx, value in cards_dict.items():
+    index_span = len(evaluate_card(value[0]))
+    quantity = value[1]
+    for i in range(idx+1, idx+index_span+1):
+        print(idx, i)
+        try:
+            cards_dict[i][1]+=quantity
+        except KeyError:
+            pass
+
+
+tot = 0
+for k, v in cards_dict.items():
+    print(k, v)
+    tot += v[1]
+print(tot)
+
+
+
+
+
+
 def p1():
     total =0
     for card in INP:
         total += compute_score(evaluate_card(card))
-
     return total
 
-print(p1())
+
+
+# print(p1())
