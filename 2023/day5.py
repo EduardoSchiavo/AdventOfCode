@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from random import seed
 
 
-with open('inputs/input5.txt') as ifile:
+with open('examples/example5.txt') as ifile:
     inp=ifile.read()
 
 # print(inp.split('\n\n'))
@@ -108,7 +108,7 @@ def is_starting_seed(seed: int, starting_seeds: list[tuple]):
 def sort_by_destination(map: list[Instruction]):
     return sorted( map, key=lambda x: x.destination_start)
 
-def location_path(location: int, maps)-> int:
+def location_path(location: int, maps: list[list[Instruction]])-> int:
     current = location
     for map in maps:
         for instruction in map:
@@ -130,22 +130,23 @@ print('maps reversed')
 def compute_locations(last_map):
     locations = []
     for inst in last_map:
-        locations.extend([range(inst.destination_start, inst.destination_start+inst.span)])
-    return locations
+        locations.extend([(inst.destination_start, inst.destination_start+inst.span)])
+    return sorted(locations, key=lambda x:x[0])
                          
 
 
 LOCATIONS = compute_locations(MAPS[-1])
 SEED_RANGES = update_seeds(STARTING_SEEDS)
-# print(LOCATIONS)
+print(LOCATIONS)
 print(SEED_RANGES)
 
 def test():
     for chunk in LOCATIONS:
         for loc in chunk:
-            seed = location_path(loc, NEW_MAPS)
+            seed = location_path(loc, MAPS[::-1])
             if is_starting_seed(seed, SEED_RANGES):
-                return loc
+                return seed
+    return None
 print(test())
 
 
