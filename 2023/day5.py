@@ -2,7 +2,11 @@ from dataclasses import dataclass
 from random import seed
 
 
-with open('examples/example5.txt') as ifile:
+# with open('examples/example5.txt') as ifile:
+#     inp=ifile.read()
+
+
+with open('input5.txt') as ifile:
     inp=ifile.read()
 
 # print(inp.split('\n\n'))
@@ -141,13 +145,19 @@ print(LOCATIONS)
 print(SEED_RANGES)
 
 def test():
-    for chunk in LOCATIONS:
-        for loc in chunk:
-            seed = location_path(loc, MAPS[::-1])
-            if is_starting_seed(seed, SEED_RANGES):
-                return seed
+    # for chunk in LOCATIONS:
+    #     print(chunk[0], chunk[1])
+    for loc in range(0, LOCATIONS[-1][-1]):
+        # print(loc)
+        seed = location_path(loc, MAPS[::-1])
+        if is_starting_seed(seed, SEED_RANGES):
+            return loc
     return None
 print(test())
 
+
+# print(location_path(46, MAPS[::-1]))
+
+# print(is_starting_seed(82, SEED_RANGES))
 
 
