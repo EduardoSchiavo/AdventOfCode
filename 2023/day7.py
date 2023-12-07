@@ -15,18 +15,53 @@ class Hand:
     bid: int
     # rank: int = None
 
-# SCORE_MAP = {'5': [], '41': [], '32': [], '311': [], '221': [], '2111': [], '11111': []}
 SCORE_MAP = { '11111': [], '2111': [],  '221': [], '311': [],'32': [],'41': [], '5': []  }
-CARD_VALUES = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2']
+CARD_VALUES = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'] #p1
+# CARD_VALUES = ['A', 'K', 'Q', 'T', '9', '8', '7', '6', '5', '4', '3', '2', 'J'] #p2
 
 def parse_hands(hands: list):
     return [Hand(card, int(bid)) for card, bid in [hand.split() for hand in hands]]
 
 
-def get_hand_type(hand: Hand, score_map: dict):
-    # score_map = {'5': [], '41': [], '32': [], '311': [], '221': [], '2111': [], '11111': []}
+def get_hand_type(hand: Hand, score_map: dict, include_jolly=False):
     counts={char: str(hand.cards.count(char)) for char in hand.cards}
-    score_map[''.join(sorted(counts.values(), reverse=True))].append(hand)
+    hand_type=''.join(sorted(counts.values(), reverse=True))
+    # score_map[hand_type].append(hand)
+    if include_jolly:
+        match counts.get('J'):
+            case '1':
+                match hand_type:
+                    case '41':
+                        score_map['5'].append(hand)
+                    case '311':
+                        score_map['41'].append(hand)
+                    case '221':
+                        score_map['32'].append(hand)
+                    case '2111':
+                        score_map['311'].append(hand)
+                    case '11111':
+                        score_map['2111'].append(hand)    
+            case '2':
+                match hand_type:
+                    case '32':
+                        score_map['5'].append(hand)
+                    case '221':
+                        score_map['41'].append(hand)
+                    case '2111':
+                        score_map['311'].append(hand)
+            case '3':
+                match hand_type:
+                    case '32':
+                        score_map['5'].append(hand)
+                    case '311':
+                        score_map['41'].append(hand)
+            case None :
+                score_map[hand_type].append(hand)
+            case _ :
+                print(counts.get('J'))
+                score_map['5'].append(hand)
+    else:
+        score_map[hand_type].append(hand)
     return score_map
 
 def get_winning(hand1: str, hand2: str): #only for cards of same type
@@ -44,16 +79,13 @@ def get_winning(hand1: str, hand2: str): #only for cards of same type
 
 
 
-def sort_by_hand_type(hands: list[Hand], score_map: dict):
+def sort_by_hand_type(hands: list[Hand], score_map: dict, include_jolly=False):
     for hand in hands:
-        score_map=get_hand_type(hand, score_map)
+        score_map=get_hand_type(hand, score_map, include_jolly)
     return score_map
-    # return sorted(hands, key= lambda x: get_hand_type(x.cards))
-
 
 
 def sort_hands_of_same_type(hands: list[Hand]):
-    # print(hands)
     cmp=cmp_to_key(get_winning)
     return sorted(hands, key=cmp, reverse=True)
 
@@ -77,6 +109,25 @@ def p1():
     return score
 
 
+def p2():
+    
+    hands= parse_hands(INP)
+    hand_types_dict = sort_by_hand_type(hands, SCORE_MAP, include_jolly=True)
+    hand_types_dict = sort_same_type_blocks(hand_types_dict)
+    # print(hand_types_dict)
+
+    shift_by=0
+    score=0
+    for _, hands in hand_types_dict.items():
+        for idx, hand in enumerate(hands):
+            # print("scoring", hand, idx+1, shift_by)
+            score+=hand.bid*(idx+1+shift_by)
+        shift_by+=len(hands)
+    return score
+
+
+
+
 # hands= parse_hands(INP)
 # print(hands)
 # hand_types_dict = sort_by_hand_type(hands, SCORE_MAP)
@@ -85,4 +136,6 @@ def p1():
 # print(sorted_hands)
 
 
-print(p1())
+# print(p2())
+
+
