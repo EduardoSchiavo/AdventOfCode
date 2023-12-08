@@ -33,22 +33,14 @@ def execute_instructions(current, count: int):
     return execute_instructions(current, count)
 
 
-def transverse(start_from):
-    current = start_from
-    count = 0
-    return execute_instructions(current, count)
-
-
 def p1():
-    print(transverse('AAA'))
-
-
-p1()  # 20093
+    print(execute_instructions('AAA', 0))
 
 
 def p2():
-    print(lcm(*[transverse(starter)
+    print(lcm(*[execute_instructions(starter, 0)
           for starter in [key for key in NODES.keys() if key[-1] == 'A']]))
 
 
+p1()  # 20093
 p2()  # 22103062509257
