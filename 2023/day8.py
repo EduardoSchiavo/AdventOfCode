@@ -1,8 +1,8 @@
 
 from enum import Enum
+from math import lcm
 
-
-EXAMPLE = "examples/example8p2.txt"
+EXAMPLE = "examples/example8p3.txt"
 INPUT = "inputs/input8.txt"
 
 with open(INPUT) as ifile:
@@ -24,7 +24,7 @@ def execute_instructions(current, nodes, instructions, count: int):
     for inst in instructions:
         count +=1
         current = nodes[current][inst.value]
-        if current == 'ZZZ': 
+        if current[-1]=='Z': 
             return count
     return execute_instructions(current, nodes, instructions, count)
 
@@ -38,4 +38,14 @@ def p1():
     print(transverse('AAA', nodes, instr))
 
 p1() #20093
+
+def get_starting_nodes(nodes):
+    return [key for key in nodes.keys() if key[-1]=='A']
+
+def p2():
+    instr, nodes = parse_instructions_and_tree(INP)
+    starting = get_starting_nodes(nodes)
+    print(lcm(*[transverse(starter, nodes, instr) for starter in starting ]))
+
+p2() #22103062509257
 
