@@ -90,7 +90,6 @@ public class day4 {
         while ((line = reader.readLine()) != null) {
             for (int col = 0; col < line.length(); col++) {
                 char letter = line.charAt(col);
-                // Using "row,col" as a string representation of coordinates
                 Point key = new Point(row, col);
                 map.put(key, letter);
             }
