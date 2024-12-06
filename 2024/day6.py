@@ -43,7 +43,7 @@ def p1():
     return len(set(visited))
 
 
-# BRUTEFORE
+# BRUTEFORCE
 def p2(path: list[tuple]):
     tot = 0
     for pos in path:
