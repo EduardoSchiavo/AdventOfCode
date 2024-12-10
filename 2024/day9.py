@@ -25,19 +25,16 @@ def reallocate_blocks(disks: list, mem: list) -> list:
 def checksum_p2(disks: list, repos: list) -> int:
     tot = 0
     offset = 0
-    for i in range(len(disks)):
+    for i in range(len(repos)):
         if isinstance(disks[i], str):
             offset += int(disks[i])
         else:
             for j in range(disks[i]):
                 tot += (j+offset)*i
             offset += disks[i]
-        try:
-            for k in range(len(repos[i])):
-                tot += (k+offset)*repos[i][k]
-            offset += len(repos[i])
-        except IndexError:
-            pass
+        for k in range(len(repos[i])):
+            tot += (k+offset)*repos[i][k]
+        offset += len(repos[i])
     return tot
 
 
