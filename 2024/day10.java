@@ -2,7 +2,6 @@ import java.awt.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.annotation.Target;
 import java.util.*;
 import java.util.List;
 
@@ -12,31 +11,28 @@ public class day10 {
     public static void main(String[] s) throws IOException {
         Map<Point, Integer> landMap = parseFile("inputs/input10.txt");
         List<Point> heads = getHeads(landMap);
-        Point bounds = getBounds(landMap);
 
-        int resP1 = p1(landMap, heads, bounds);
+        int resP1 = p1(landMap, heads);
         System.out.println(resP1);
-        int resP2 = p2(landMap, heads, bounds);
+        int resP2 = p2(landMap, heads);
         System.out.println(resP2);
     }
 
     private static Integer p1(Map<Point, Integer> landMap,
-                              List<Point> heads,
-                              Point bounds){
+                              List<Point> heads){
         int tot = 0;
         for(Point head : heads){
-            tot += hike(landMap, head, 9, bounds, new ArrayList<>(), false);
+            tot += hike(landMap, head, 9, new ArrayList<>() );
         }
         return tot;
 
 
     }
     private static Integer p2(Map<Point, Integer> landMap,
-                              List<Point> heads,
-                              Point bounds){
+                              List<Point> heads){
         int tot = 0;
         for(Point head : heads){
-            tot += hike(landMap, head, 9, bounds, new ArrayList<>(), true);
+            tot += hike(landMap, head, 9, null);
         }
         return tot;
 
@@ -44,19 +40,15 @@ public class day10 {
     }
     private static Integer hike(Map<Point, Integer> landMap,
                                 Point pos, Integer target,
-                                Point bounds, List<Point> visited, Boolean countingPaths) {
+                                List<Point> visited) {
         Integer tot = 0;
         int[][] dirs = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
-        if (pos.x < 0 || pos.x > bounds.x || pos.y < 0 || pos.y > bounds.y) {
+
+        if (visited != null && visited.contains(pos)) {
             return 0;
         }
 
-
-        if (visited.contains(pos)) {
-            return 0;
-        }
-
-        if (!countingPaths) {
+        if (visited != null) {
             visited.add(pos);
         }
         Integer currVal = landMap.get(pos);
@@ -65,13 +57,11 @@ public class day10 {
         }
 
         for (int[] dir: dirs){
-
-            System.out.println(Arrays.toString(dir));
             Point next = new Point(pos.x+dir[0], pos.y+dir[1]);
             if (landMap.get(next) == null || landMap.get(next) - currVal != 1){
                 continue;
             }
-            tot += hike(landMap, next, target,bounds, visited, countingPaths);
+            tot += hike(landMap, next, target, visited);
         }
         return tot;
 
