@@ -1,5 +1,3 @@
-import datetime
-a = datetime.datetime.now()
 with open("inputs/input9.txt") as ifile:
     INP = ifile.read().strip('\n')
 
@@ -97,4 +95,3 @@ def p2():
 
 print(p1())
 print(p2())
-print(datetime.datetime.now() -a)
