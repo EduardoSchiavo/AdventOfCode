@@ -5,6 +5,7 @@ with open("inputs/input11.txt") as ifile:
 def get_initial_state(stones: list) -> dict:
     return {s: 1 for s in stones}
 
+
 def step(state: dict) -> dict:
     new_state = {}
     for s in state.keys():
@@ -25,9 +26,8 @@ def step(state: dict) -> dict:
     return new_state
 
 
-def score(n_steps: int):
-    start = get_initial_state(STONES)
-    curr = start
+def score(n_steps: int) -> int:
+    curr = get_initial_state(STONES)
     for i in range(n_steps):
         new = step(curr)
         curr = new
@@ -37,9 +37,9 @@ def score(n_steps: int):
 def p1():
     return score(25)
 
+
 def p2():
     return score(75)
-
 
 
 print(p1())
