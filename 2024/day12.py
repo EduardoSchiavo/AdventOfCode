@@ -7,7 +7,6 @@ BOUNDS = list(INP.keys())[-1]
 DIRS = ((0, 1), (1, 0), (-1, 0), (0, -1))
 
 
-
 def get_bounds(region: list[tuple]) -> tuple:
     return (min(t[0] for t in region),
             max(t[0] for t in region),
@@ -33,31 +32,29 @@ def get_edges(region: list[tuple], land: dict):
             bounds[2], bounds[3]+1) if (x, y) in region and is_edge((x, y), (-1, 0), land)]
         if line:
             count += 1
-        for i in range(len(line)-1):
-            if line[i+1] - line[i] != 1:
-                count += 1
+        count += sum(1 for i in range(len(line) - 1)
+                     if line[i + 1] - line[i] != 1)
 
         line = [y for y in range(
             bounds[2], bounds[3]+1) if (x, y) in region and is_edge((x, y), (1, 0), land)]
         if line:
             count += 1
-        for i in range(len(line)-1):
-            if line[i+1] - line[i] != 1:
-                count += 1
+
+        count += sum(1 for i in range(len(line) - 1)
+                     if line[i + 1] - line[i] != 1)
     for y in range(bounds[2], bounds[3]+1):
-        line = [x for x in range(bounds[0], bounds[1]+1) if (x, y) in region and is_edge((x, y), (0, -1), land)]
+        line = [x for x in range(
+            bounds[0], bounds[1]+1) if (x, y) in region and is_edge((x, y), (0, -1), land)]
         if line:
             count += 1
-        for i in range(len(line)-1):
-            if line[i+1] - line[i] != 1:
-                count += 1
+        count += sum(1 for i in range(len(line) - 1)
+                     if line[i + 1] - line[i] != 1)
         line = [x for x in range(
             bounds[0], bounds[1]+1) if (x, y) in region and is_edge((x, y), (0, +1), land)]
         if line:
             count += 1
-        for i in range(len(line)-1):
-            if line[i+1] - line[i] != 1:
-                count += 1
+        count += sum(1 for i in range(len(line) - 1)
+                     if line[i + 1] - line[i] != 1)
 
     return count
 
@@ -82,6 +79,8 @@ def explore_region(land: dict, pos: tuple, prev: tuple, visited: list) -> list:
     return area
 
 # swap dirs and j to make more efficiest: check dirs and see if point is in region
+
+
 def count_contacts(region: list[tuple]) -> int:
     tot = 0
     for i in range(len(region)):
@@ -89,7 +88,6 @@ def count_contacts(region: list[tuple]) -> int:
             delta = tuple(x-y for x, y in zip(region[i], region[j]))
             tot += delta in DIRS
     return tot
-
 
 
 def score(part: int):
@@ -110,34 +108,11 @@ def score(part: int):
 
 
 def p1():
-    regions = []
-    visited = []
-    price = 0
-    for point in INP.keys():
-        if point in visited:
-            continue
-        region = explore_region(INP, point, None, [])
-        price += len(region)*(len(region)*4-count_contacts(region)*2)
+    return score(1)
 
-        regions.append(region)
-        visited.extend(region)
-    return price
 
 def p2():
-    regions = []
-    visited = []
-    price = 0
-    for point in INP.keys():
-        if point in visited:
-            continue
-        region = explore_region(INP, point, None, [])
-        price += len(region)*get_edges(region, INP)
-
-        regions.append(region)
-        visited.extend(region)
-    return price
-
-
+    return score(2)
 
 
 print(p1())
