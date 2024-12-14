@@ -6,7 +6,7 @@ with open("inputs/input14.txt") as ifile:
 BOUNDS = (101, 103)  # 101, 103
 
 
-def display(occupied: set):
+def display(occupied: set)-> bool:
     for y in range(BOUNDS[1]):
         line = ""
         for x in range(BOUNDS[0]):
@@ -14,7 +14,9 @@ def display(occupied: set):
                 line += "#"
             else:
                 line += "."
-        print(line)
+        if "########" in line:
+            return True
+    return False
 
 
 def step(robot: list[tuple], n: int) -> tuple:
@@ -47,15 +49,8 @@ def p2():
         for robot in INP:
             pos = step(robot, s)
             occupied.add(pos)
-        max_y = max([o[1] for o in occupied])
-        for y in range(max_y):
-            x_coords = sorted([o[0] for o in occupied if o[1] == y])
-            consecutive = 0
-            for i in range(1, len(x_coords)):
-                if x_coords[i] -x_coords[i-1] == 1:
-                    consecutive += 1
-                if consecutive >= 20:
-                    return s
+        if display(occupied):
+            return s
 
 print(p1())
 print(p2())
