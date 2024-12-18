@@ -1,13 +1,11 @@
 import math
 from heapq import heapify
 from heapq import heappop
-from math import dist
 from heapq import heappush
 from math import floor
 with open("inputs/input18.txt") as ifile:
     BYTES = [tuple(map(int, b.split(","))) for b in ifile.read().splitlines()]
 
-# print(BYTES)
 
 START = (0, 0)
 # END = (6, 6)  # 70, 70
