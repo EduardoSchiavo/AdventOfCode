@@ -1,16 +1,10 @@
-import datetime
-a = datetime.datetime.now()
 with open("inputs/input20.txt") as ifile:
     MAP = {(x, y): v for x, row in enumerate(ifile.read().splitlines())
            for y, v in enumerate(row)}
 
 START = [pos for pos in MAP.keys() if MAP[pos] == 'S'][0]
 END = [pos for pos in MAP.keys() if MAP[pos] == 'E'][0]
-
 DIRS = [(0, 1), (1, 0), (0, -1), (-1, 0)]  # R, D, L, U
-print(START, END)
-
-MAXCHEATS = 20
 
 
 def find_path(s: tuple, e: tuple, track: dict):
@@ -70,4 +64,3 @@ def p2():
 
 print(p1())
 print(p2())
-print(datetime.datetime.now() -a)
