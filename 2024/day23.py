@@ -1,7 +1,6 @@
 with open("inputs/input23.txt") as ifile:
     NETMAP = ifile.read().splitlines()
 
-
 def get_connections(netmap: list[str]) -> dict:
     conn = {}
     for link in netmap:
@@ -26,8 +25,19 @@ def get_groups(conn: dict)-> set:
                         groups.append(g)
                     continue
     return groups
-    # return [",".join(g) for g in groups]
 
+
+def bk(r: set, p: set, x: set, conn: dict, cliques: list)-> set:
+    if p == set() and x == set():
+        cliques.append(r)
+        return 
+    for v in p.copy():
+        rn = r | {v}
+        xn = x & set(conn[v])
+        pn = p & set(conn[v])
+        bk(rn, pn, xn, conn, cliques)
+        p.remove(v)
+        x.add(v)
 
 def p1():
     comps = get_connections(NETMAP)
@@ -35,5 +45,11 @@ def p1():
     print(groups)
     return sum(1 for g in groups if any(c.startswith('t') for c in g))
 
-print(p1())
+def p2():
+    comps = get_connections(NETMAP)
+    cliques = []
+    bk(set(), set(comps.keys()), set(), comps, cliques)
+    return ",".join(sorted(max(cliques, key=len)))
+
+print(p2())
 
