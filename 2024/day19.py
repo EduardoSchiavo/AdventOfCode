@@ -1,32 +1,29 @@
+from functools import cache
 with open("inputs/input19.txt") as ifile:
     T, P = ifile.read().split("\n\n")
     T = [t.strip() for t in T.split(",")]
     P = P.splitlines()
 
-# print(T)
-
 
 def get_candidates(c: str, avail: list[str]):
     candidates = []
     for a in avail:
-        # print(f"a: {a}")
         if a.startswith(c):
             candidates.append(a)
     return candidates
 
 
+CAND = {}
 
-def is_possible(p: int, word: str, avail: list[str], seen: list, c: str = None):
-    if (p, c) in seen:
-        return False
-    seen.append((p, c))
 
+@cache
+def is_possible(p: int, word: str, avail: tuple[str], c: str = None):
+    tot = 0
     if p > len(word):
         return False
 
     if c and p == len(word)-len(c) and is_valid(c, p, word):
         return True
-    # print(f"p: {p}, c: {c}, word: {word}")
 
     if c and not is_valid(c, p, word):
         return False
@@ -37,13 +34,14 @@ def is_possible(p: int, word: str, avail: list[str], seen: list, c: str = None):
     if p > len(word)-1:
         return False
 
-    cand = get_candidates(word[p], avail)
+    if word[p] not in CAND:
+        CAND[word[p]] = get_candidates(word[p], avail)
 
-    for c in cand:
-        if is_possible(p, word, avail, seen, c):
-            return True
+    for c in CAND[word[p]]:
+        tot += is_possible(p, word, avail, c)
 
-    return False
+    return tot
+
 
 def is_valid(c, p, word):
     if len(c) == 1:
@@ -63,11 +61,17 @@ def is_valid(c, p, word):
 def p1():
     tot = 0
     for pat in P:
-        if is_possible(0, pat, T, []):
-            tot +=1
-            print(pat)
+        if is_possible(0, pat, tuple(T)):
+            tot += 1
+    return tot
+
+
+def p2():
+    tot = 0
+    for pat in P:
+        tot += is_possible(0, pat, tuple(T))
     return tot
 
 
 print(p1())
-# print(is_possible(0, "bwurrg", T, []))
+print(p2())
