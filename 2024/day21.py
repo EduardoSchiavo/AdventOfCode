@@ -23,6 +23,7 @@ ARROWS = {(-1, 0): '^',
 SUBPATHS = {}
 PERMS = {}
 
+
 def get_sequence(code: str):
     pos = NUMPAD['A']
     keys = []
@@ -34,10 +35,13 @@ def get_sequence(code: str):
 
 
 def precompute_best_arrow_sequences():
-    moves = itertools.product(KEYPAD.keys(), repeat=2)
-    print(tuple(m for m in moves if m[0] != m[1]))
-
+    # moves = itertools.product(KEYPAD.keys(), repeat=2)
+    bs = {}
+    moves = tuple(m for m in itertools.product(KEYPAD.keys(), repeat=2) if m[0] != m[1])
+    print(f"moves = {moves}")
+    # for k in KEYPAD:
+    #     delta = (KEYPAD[k][0] - pos[0], KEYPAD[k][1] - pos[1])
+    #     print(f"key: {KEYPAD[k]}
 
 print(get_sequence('379A'))
 print(precompute_best_arrow_sequences())
-
