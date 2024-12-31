@@ -1,6 +1,7 @@
 import itertools
+from functools import cache
 import math
-with open("examples/example21.txt") as ifile:
+with open("inputs/input21.txt") as ifile:
     CODES = ifile.read().splitlines()
 
 NUMPAD = {'7': (0, 0), '8': (0, 1), '9': (0, 2),
@@ -20,25 +21,14 @@ ARROWS = {(-1, 0): '^',
           (1, 0):  'v',
           (0, 1):  '>'}
 
-SUBPATHS = {}
-PERMS = {}
-
-
-def get_sequence(code: str):
-    pos = NUMPAD['A']
-    keys = []
-    for d in code:
-        delta = (NUMPAD[d][0] - pos[0], NUMPAD[d][1] - pos[1])
-        keys.append(delta)
-        pos = NUMPAD[d]
-    # print(keys)
-    return keys
 
 
 def precompute_best_arrow_sequences():
     bs = {}
     moves = tuple(m for m in itertools.product(
         KEYPAD.keys(), repeat=2) if m[0] != m[1])
+
+    exclude = {'A': "<<", '^': "<", '<': "^"}
     for m in moves:
         delta = (KEYPAD[m[1]][0] - KEYPAD[m[0]][0],
                  KEYPAD[m[1]][1] - KEYPAD[m[0]][1])
@@ -48,99 +38,70 @@ def precompute_best_arrow_sequences():
         for y in range(abs(delta[1])):
             arr += ARROWS[0, (delta[1]/abs(delta[1]))]
         # avoid gap
-        if delta[0] < 0:
-            arr = arr[::-1]
-        bs["".join(m)] = arr + 'A'
+        bs["".join(m)] = {"".join(s) + 'A' for s in itertools.permutations(arr)
+                          if not "".join(s).startswith(exclude.get(m[0], "@"))}
     for a in "<>^vA":
-        bs[a*2] = 'AA'
+        bs[a*2] = 'A'
     return bs
 
 
-# try computing all possiblities just for this first step
-def get_arr_seq(seq: list[tuple]) -> set:
-    pos = NUMPAD['A']
-    arr_seq = {""}
-    for delta in seq:
+def precompute_best_num_sequences():
+    bs = {}
+    moves = tuple(m for m in itertools.product(
+        NUMPAD.keys(), repeat=2) if m[0] != m[1])
+
+    exclude = {'A': "<<", '0': "<", '7': "vvv", '4': "vv", '1': "v"}
+    for m in moves:
+        delta = (NUMPAD[m[1]][0] - NUMPAD[m[0]][0],
+                 NUMPAD[m[1]][1] - NUMPAD[m[0]][1])
         arr = ""
         for x in range(abs(delta[0])):
             arr += ARROWS[(delta[0]/abs(delta[0]), 0)]
         for y in range(abs(delta[1])):
             arr += ARROWS[0, (delta[1]/abs(delta[1]))]
 
-        to_add = set()
-        if (pos[0] == 3 and tuple([sum(x) for x in zip(pos, delta)])[1] == 0) or (pos[1] == 0 and tuple([sum(x) for x in zip(pos, delta)])[0] == 3):
-            for a in arr_seq:
-                if delta[0] < 0 ^ delta[1] > 0:
-                    to_add.add(a + arr[::-1] + 'A')
-                else:
-                    to_add.add(a + arr + 'A')
-        else:
-            for a in arr_seq:
-                to_add.add(a + arr + 'A')
-                to_add.add(a + arr[::-1] + 'A')
-        arr_seq = to_add
-        pos = tuple([sum(x) for x in zip(pos, delta)])
-    return arr_seq
+        bs["".join(m)] = {"".join(s) + 'A' for s in itertools.permutations(arr)
+                          if not "".join(s).startswith(exclude.get(m[0], "@"))}
+
+    return bs
 
 
-# def propagate(arr_seq: str, bs: dict):
-#     arr = ""
-#     arr_seq = 'A' + arr_seq
-#     for i in range(len(arr_seq)-1):
-#         if arr_seq[i] != arr_seq[i+1]:
-#             arr += bs[arr_seq[i] + arr_seq[i+1]]
-#         arr += 'A'
-#     return arr
-
-def init_state(arr_seq: str, bs: dict):
-    state = {}
-    for i in arr_seq.rstrip('A').split('A'):
-        if i == '':
-            continue
-        if i not in state:
-            state[i] = 0
-        state[i] += 1
-    return state
+BS_KEY = precompute_best_arrow_sequences()
+BS_NUM = precompute_best_num_sequences()
 
 
-def propagate(state: dict, bs: dict):
-    new_state = {}
-    for move in state:
-        p_move = 'A' + move + 'A'
-        for i in range(len(p_move)-1):
-            pair = p_move[i] +p_move[i+1]
-            # print(f"p: {pair}")
-            if bs[pair].rstrip('A') not in new_state:
-                new_state[bs[pair].rstrip('A')] = 0
-            new_state[bs[pair].rstrip('A')] += state[move]
-    return new_state
+@cache
+def get_len(code: str, depth: int)-> int:
+    if depth == 0:
+        return len(code)
+    length = 0
+    code = 'A' + code
+    for i in range(len(code)-1):
+        length += min(get_len(seq, depth-1) for seq in BS_KEY[code[i:i+2]])
+    return length
 
-def get_len(state:dict):
-    tot = 0
-    for k, v in state.items():
-        tot += (len(k)+1)*v
-    return tot
+def nums_to_keys(code: str)-> list[str]:
+    ways = {''}
+    code = 'A' + code
+    for i in range(len(code)-1):
+        new = set()
+        for w in ways:
+            new.update([w + comb for comb in  BS_NUM[code[i] + code[i+1]]])
+        ways = new
+    return ways
 
 def p1():
-    bs = precompute_best_arrow_sequences()
-    print(bs)
     tot = 0
     for code in CODES:
-        print(f"code: {code}")
-        s1 = get_arr_seq(get_sequence(code))
-        min_len = min(len(s) for s in s1)
-        opts = [s for s in s1 if len(s) == min_len]
-        final = set()
+        opts = nums_to_keys(code)
+        best_len = math.inf
         for op in opts:
-            s = op
-            state = init_state(s, bs)
-            for i in range(2):
-                state = propagate(state, bs)
-                print(f"state: {state}, len: {get_len(state)}")
-            final.add(get_len(state))
-        # print(f" final: {final} len {min(len(s) for s in final) }")
-        tot += min(s for s in final) * int(code.strip('A'))
+            op_len = 0
+            op_len = get_len(op, 25)
+            if op_len < best_len:
+                best_len = op_len
+        tot += best_len*int(code.rstrip('A'))
     return tot
 
-
 print(p1())
+
