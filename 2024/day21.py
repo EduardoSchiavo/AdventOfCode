@@ -22,22 +22,19 @@ ARROWS = {(-1, 0): '^',
           (0, 1):  '>'}
 
 
-
-def precompute_best_arrow_sequences():
+def precompute_best_sequences(keypad: dict, exclude: dict)-> dict:
     bs = {}
     moves = tuple(m for m in itertools.product(
-        KEYPAD.keys(), repeat=2) if m[0] != m[1])
+        keypad.keys(), repeat=2) if m[0] != m[1])
 
-    exclude = {'A': "<<", '^': "<", '<': "^"}
     for m in moves:
-        delta = (KEYPAD[m[1]][0] - KEYPAD[m[0]][0],
-                 KEYPAD[m[1]][1] - KEYPAD[m[0]][1])
+        delta = (keypad[m[1]][0] - keypad[m[0]][0],
+                 keypad[m[1]][1] - keypad[m[0]][1])
         arr = ""
         for x in range(abs(delta[0])):
             arr += ARROWS[(delta[0]/abs(delta[0]), 0)]
         for y in range(abs(delta[1])):
             arr += ARROWS[0, (delta[1]/abs(delta[1]))]
-        # avoid gap
         bs["".join(m)] = {"".join(s) + 'A' for s in itertools.permutations(arr)
                           if not "".join(s).startswith(exclude.get(m[0], "@"))}
     for a in "<>^vA":
@@ -45,30 +42,8 @@ def precompute_best_arrow_sequences():
     return bs
 
 
-def precompute_best_num_sequences():
-    bs = {}
-    moves = tuple(m for m in itertools.product(
-        NUMPAD.keys(), repeat=2) if m[0] != m[1])
-
-    exclude = {'A': "<<", '0': "<", '7': "vvv", '4': "vv", '1': "v"}
-    for m in moves:
-        delta = (NUMPAD[m[1]][0] - NUMPAD[m[0]][0],
-                 NUMPAD[m[1]][1] - NUMPAD[m[0]][1])
-        arr = ""
-        for x in range(abs(delta[0])):
-            arr += ARROWS[(delta[0]/abs(delta[0]), 0)]
-        for y in range(abs(delta[1])):
-            arr += ARROWS[0, (delta[1]/abs(delta[1]))]
-
-        bs["".join(m)] = {"".join(s) + 'A' for s in itertools.permutations(arr)
-                          if not "".join(s).startswith(exclude.get(m[0], "@"))}
-
-    return bs
-
-
-BS_KEY = precompute_best_arrow_sequences()
-BS_NUM = precompute_best_num_sequences()
-
+BS_KEY = precompute_best_sequences(KEYPAD,{'A': "<<", '^': "<", '<': "^"} )
+BS_NUM = precompute_best_sequences(NUMPAD,{'A': "<<", '0': "<", '7': "vvv", '4': "vv", '1': "v"} )
 
 @cache
 def get_len(code: str, depth: int)-> int:
@@ -90,18 +65,26 @@ def nums_to_keys(code: str)-> list[str]:
         ways = new
     return ways
 
-def p1():
+def score(depth: int):
     tot = 0
     for code in CODES:
         opts = nums_to_keys(code)
         best_len = math.inf
         for op in opts:
             op_len = 0
-            op_len = get_len(op, 25)
+            op_len = get_len(op, depth)
             if op_len < best_len:
                 best_len = op_len
         tot += best_len*int(code.rstrip('A'))
     return tot
 
+def p1():
+    return score(2)
+
+def p2():
+    return score(25)
+
+
 print(p1())
+print(p2())
 
