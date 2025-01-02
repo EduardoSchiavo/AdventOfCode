@@ -1,13 +1,8 @@
-
 with open("inputs/input17.txt") as ifile:
     REGS, PROG = ifile.read().split("\n\n")
     REGS = {r.split(':')[0].split(" ")[1]: int(r.split(':')[1])
             for r in REGS.split("\n")}
     PROG = list(map(int, PROG.split(":")[1].strip().split(',')))
-# print(REGS)
-
-
-print(PROG)
 
 
 def get_combo(o: int, regs: dict) -> int:
@@ -60,7 +55,6 @@ def execute(prog: list, regs: dict):
     p = 0
     outs = []
     while p < len(prog):
-        # print(f"p: {p}, regs: {regs}")
         match prog[p]:
             case 0:
                 adv(prog[p+1], regs)
@@ -90,4 +84,21 @@ def execute(prog: list, regs: dict):
     return ",".join([str(o) for o in outs])
 
 
-print(execute(PROG, REGS))
+def p1():
+    return execute(PROG, REGS)
+
+def p2():
+    cursor = -1
+    a_val = 8**(len(PROG) + cursor)
+    while abs(cursor) <= len(PROG):
+        out = execute(PROG, {'A': a_val, 'B': 0, 'C': 0}).split(",")
+        if all(int(out[i]) == PROG[i] for i in range(-1, cursor-1, -1)):
+            cursor -= 1
+            continue
+
+        a_val += 8**(len(PROG) + cursor)
+
+    return a_val
+
+print(p1())
+print(p2())
