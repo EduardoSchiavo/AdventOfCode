@@ -10,14 +10,6 @@ def generate_next(sn: int) -> int:
     return s3
 
 
-def generate_prices(sn: int) -> list[int]:
-    prices = [(sn % 10,)]
-    for i in range(1, 2001):
-        sn = generate_next(sn)
-        prices.append((sn % 10, sn % 10-prices[i-1][0]))
-    return prices
-
-
 def get_best_seq(sn: int) -> list[int]:
     best = {}
     prices = [sn % 10]
@@ -45,7 +37,8 @@ def p1():
 
 
 def get_all_keys():
-    return tuple(itertools.product(range(-9,10), repeat=4))
+    return tuple(itertools.product(range(-9, 10), repeat=4))
+
 
 def p2():
     seqs = []
@@ -59,6 +52,7 @@ def p2():
             bv = val
 
     return bv
+
 
 print(p1())
 print(p2())
