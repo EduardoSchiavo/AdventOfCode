@@ -30,9 +30,9 @@ def p2():
                 tot += 1
         else:
             curr = (curr - val) % 100
-            if (curr > prev or curr == 0) and prev!= 0:
+            if (curr > prev or curr == 0) and prev != 0:
                 tot += 1
-        tot += val //100 
+        tot += val // 100
     return tot
 
 
