@@ -25,12 +25,6 @@ def get_invalid_numbers(r: tuple[int]):
         if stringified[:len(stringified)//2] == stringified[len(stringified)//2:]:
             invalid_count += int(stringified)
 
-        # generate all other possible values
-        if len(stringified) <= r[1]//2:
-            candidate = stringified + stringified
-            if r[0] <= int(candidate) <= r[1]:
-                invalid_count += int(candidate)
-
     return invalid_count
 
 
