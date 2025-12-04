@@ -2,13 +2,9 @@ with open('inputs/input4.txt') as ifile:
     inp = ifile.read().splitlines()
 
 
-GRID = {}
-for i in range(len(inp)):
-    for j in range(len(inp[0])):
-        GRID[i, j] = inp[i][j]
-
-print(inp)
-print(GRID)
+GRID = {(i, j): inp[i][j]
+        for i in range(len(inp))
+        for j in range(len(inp[0]))}
 
 ADJ = [(-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1)]
 
@@ -22,15 +18,29 @@ def p1():
     for k, v in GRID.items():
         if v != '@':
             continue
-        n = 0
-        for tup in ADJ:
-            check = add_up(tup, k)
-            if check in GRID.keys() and GRID[check] == '@':
-                n += 1
-        if n < 4:
+        if is_accessible(k, v, GRID):
             tot += 1
-            print(k)
     return tot
+
+def p2():
+    tot = 0
+    g = GRID
+    while (True):
+        g, removed = remove_rolls(g)
+        tot += removed
+        if (removed == 0):
+            return tot
+
+def is_accessible(k: tuple, v: str, grid: dict) -> bool:
+    n = 0
+    for tup in ADJ:
+        check = add_up(tup, k)
+        if check in grid.keys() and grid[check] == '@':
+            n += 1
+    if n < 4:
+        return True
+    return False
+
 
 def remove_rolls(grid: dict):
     old_grid = grid.copy()
@@ -39,28 +49,11 @@ def remove_rolls(grid: dict):
     for k, v in old_grid.items():
         if v != '@':
             continue
-        n = 0
-        for tup in ADJ:
-            check = add_up(tup, k)
-            if check in old_grid.keys() and old_grid[check] == '@':
-                n += 1
-        if n < 4:
-            tot += 1
-            new_grid[k]='.'
+        if is_accessible(k, v, old_grid):
+            tot +=1
+            new_grid[k] = '.'
     return new_grid, tot
 
 
-def p2():
-    tot=0
-    g = GRID
-    while(True):
-        g, removed = remove_rolls(g)
-        tot += removed
-        if (removed == 0):
-            return tot
-
-
-
-
-# print(p1())
-print(p2())
+assert p1() == 1389
+assert p2() == 9000
