@@ -6,15 +6,8 @@ with open('inputs/input5.txt') as ifile:
 
 
 def p1():
-    # tot = 0
     ranges = to_ranges(RANGES)
-    # for id in IDS:
-    #     for rng in ranges:
-    #         if id in rng:
-    #             tot += 1
-    #             break
-    # return tot
-    return sum([any(id in rng for rng in ranges) for id in IDS])
+    return sum(any(id in rng for rng in ranges) for id in IDS)
 
 
 def to_ranges(rngs: set[tuple]) -> set[range]:
@@ -32,7 +25,6 @@ def p2():
                         new_rngs.remove(g)
                     g = tuple([min(g[0], r[0]), max(g[1], r[1])])
             new_rngs.add(g)
-
         if (new_rngs == rngs):
             break
         rngs = new_rngs.copy()
