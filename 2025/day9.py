@@ -1,7 +1,7 @@
 from math import floor
 from itertools import combinations
 from functools import cmp_to_key
-with (open("examples/example9.txt")) as ifile:
+with (open("inputs/input9.txt")) as ifile:
     inp = [tuple([int(n) for n in l.split(',')])
            for l in ifile.read().splitlines()]
 
@@ -45,7 +45,7 @@ def p2():
 
     # print(all_pairs)
     print(f"low {lo}, hi {hi}")
-    return compute_square(*all_pairs[lo-1])
+    return compute_square(*all_pairs[lo])
 
 
 def get_sides(pairs: list):
@@ -62,34 +62,34 @@ def intersects(segment: tuple, perimeter: list):
         for side in perimeter:
             if side[0][0] == side[1][0]: # also perpendicular, ignore
                 continue
-            if segment[0][1] < side[0][1] < segment[1][1]:
-                print(f"intersecting at {segment[0][0], side[0][1]}")
+            if min(segment[0][1], segment[1][1]) < side[0][1] < max(segment[0][1], segment[1][1]) and min(side[0][0], side[1][0]) < segment[0][0] < max(side[0][0], side[1][0]):
+                # print(f"intersecting at {segment[0][0], side[0][1]}")
                 intersection = (segment[0][0], side[0][1])
                 if intersection in RED_TILES:
-                    print("ignore")
+                    # print("ignore")
                     continue
                 return True
     else: #perpendicular to y 
         for side in perimeter:
             if side[0][1] == side[1][1]:
                 continue
-            if segment[0][0] < side[0][0] < segment[1][0]:
+            if min(segment[0][0], segment[1][0]) < side[0][0] < max(segment[0][0], segment[1][0]) and min(side[0][1], side[1][1]) < segment[0][1] < max(side[0][1], side[1][1]):
                 intersection = (side[0][0], segment[0][1])
-                print(f"intersecting at {intersection}")
+                # print(f"intersecting at {intersection}")
                 if intersection in RED_TILES:
-                    print("ignore")
+                    # print("ignore")
                     continue
                 return True
     return False
 
 
 def is_contained(pair: tuple, perimeter: list) -> int:
-    print(f"checking box: {pair}")
+    # print(f"checking box: {pair}")
     box_sides = get_box(pair)
     for side in box_sides:
-        print(f"side : {side}")
+        # print(f"side : {side}")
         if intersects(side, perimeter):
-            print(f"side {side} intersects perimeter")
+            # print(f"side {side} intersects perimeter")
             return False
     return True
 
