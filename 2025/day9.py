@@ -1,14 +1,11 @@
-from math import floor
 from itertools import combinations
-from functools import cmp_to_key
+from functools import cache
 with (open("inputs/input9.txt")) as ifile:
     inp = [tuple([int(n) for n in l.split(',')])
            for l in ifile.read().splitlines()]
 
 
 RED_TILES = inp
-MAX_X = max(p[0] for p in RED_TILES)
-MAX_Y = max(p[1] for p in RED_TILES)
 
 
 def p1():
@@ -26,75 +23,52 @@ def precompute_pairs(coords: list[tuple]):
 
 def p2():
     all_pairs = precompute_pairs(RED_TILES)
-    
-    def compare(a, b):
-        return compute_square(*a) - compute_square(*b)
-
-    all_pairs = sorted(all_pairs, key=cmp_to_key(compare), reverse=True)
-    print(all_pairs)
-    polygon_sides = get_sides(RED_TILES)
-    lo = 0
-    hi = len(all_pairs)
-
-    while (lo < hi):
-        mid = floor(lo + (hi - lo)/2)
-        if is_contained(all_pairs[mid], polygon_sides):
-            hi = mid
-        else:
-            lo = mid + 1
-
-    # print(all_pairs)
-    print(f"low {lo}, hi {hi}")
-    return compute_square(*all_pairs[lo])
+    max_area = 0
+    for pair in all_pairs:
+        area = compute_square(*pair)
+        if area > max_area and is_valid(pair):
+            max_area = area
+    return max_area
 
 
-def get_sides(pairs: list):
-    return [(pairs[i-1], pairs[i]) for i in range(1, len(pairs))]
+@cache
+def point_in_polygon(x: int, y: int) -> bool:
+    inside = False
+
+    for (x1, y1), (x2, y2) in zip(RED_TILES, RED_TILES[1:] + RED_TILES[:1]):
+        if (x == x1 == x2 and min(y1, y2) <= y <= max(y1, y2) or
+                y == y1 == y2 and min(x1, x2) <= x <= max(x1, x2)):
+            return True
+        if ((y1 > y) != (y2 > y) and (x < (x2-x1)*(y-y1)/(y2-y1) + x1)):
+            inside = not inside
+    return inside
 
 
-def get_box(pair: tuple):
-    a, b = pair
-    return {(a, (a[0], b[1])), (a, (b[0], a[1])), (b, (a[0], b[1])), (b, (b[0], a[1]))}
-
-
-def intersects(segment: tuple, perimeter: list):
-    if segment[0][0] == segment[1][0]: #perpendicular to x
-        for side in perimeter:
-            if side[0][0] == side[1][0]: # also perpendicular, ignore
-                continue
-            if min(segment[0][1], segment[1][1]) < side[0][1] < max(segment[0][1], segment[1][1]) and min(side[0][0], side[1][0]) < segment[0][0] < max(side[0][0], side[1][0]):
-                # print(f"intersecting at {segment[0][0], side[0][1]}")
-                intersection = (segment[0][0], side[0][1])
-                if intersection in RED_TILES:
-                    # print("ignore")
-                    continue
+def edge_intersects_rect(x1, y1, x2, y2, rx1, ry1, rx2, ry2):
+    if y1 == y2:
+        if ry1 < y1 < ry2:
+            if max(x1, x2) > rx1 and min(x1, x2) < rx2:
                 return True
-    else: #perpendicular to y 
-        for side in perimeter:
-            if side[0][1] == side[1][1]:
-                continue
-            if min(segment[0][0], segment[1][0]) < side[0][0] < max(segment[0][0], segment[1][0]) and min(side[0][1], side[1][1]) < segment[0][1] < max(side[0][1], side[1][1]):
-                intersection = (side[0][0], segment[0][1])
-                # print(f"intersecting at {intersection}")
-                if intersection in RED_TILES:
-                    # print("ignore")
-                    continue
+    else:
+        if rx1 < x1 < rx2:
+            if max(y1, y2) > ry1 and min(y1, y2) < ry2:
                 return True
     return False
 
 
-def is_contained(pair: tuple, perimeter: list) -> int:
-    # print(f"checking box: {pair}")
-    box_sides = get_box(pair)
-    for side in box_sides:
-        # print(f"side : {side}")
-        if intersects(side, perimeter):
-            # print(f"side {side} intersects perimeter")
+def is_valid(pair) -> bool:
+    x1, x2 = sorted([pair[0][0], pair[1][0]])
+    y1, y2 = sorted([pair[0][1], pair[1][1]])
+
+    for x, y in [(x1, y1), (x1, y2), (x2, y1), (x2, y2)]:
+        if not point_in_polygon(x, y):
             return False
+    for (ex1, ey1), (ex2, ey2) in zip(RED_TILES, RED_TILES[1:] + RED_TILES[:1]):
+        if edge_intersects_rect(ex1, ey1, ex2, ey2, x1, y1, x2, y2):
+            return False
+
     return True
 
 
-# print(p1())
-print(p2())
-
-# print(f"polygon sides: {get_sides(RED_TILES)}")
+assert p1() == 4763509452
+assert p2() == 1516897893
