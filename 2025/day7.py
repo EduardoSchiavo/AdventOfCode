@@ -11,20 +11,21 @@ for k in DIAGRAM.keys():
         START = k
 
 OUT = len(inp)
-print(f"max size is : {len(inp)}")
 
 
 def p1():
     return len(explore_paths(START))
 
+def p2():
+    return explore_rec(START)
 
+#probably don't need two separate DFS implementations... but I can't be bother to refactor it
 def explore_paths(start: tuple):
     stack = [start]
     splitted = set()
 
     while (stack):
         curr = stack.pop()
-        # print(f"curr: {curr}")
         is_out = False
         while curr not in DIAGRAM or curr == start:
             curr = (curr[0]+2, curr[1])
@@ -38,35 +39,8 @@ def explore_paths(start: tuple):
             stack.append((curr[0]+2, curr[1]-1))
             stack.append((curr[0]+2, curr[1]+1))
             splitted.add(curr)
-    print(f"splitted: {set([s for s in splitted if s in DIAGRAM])}")
-    print(f"--- {len([s for s in splitted if s in DIAGRAM])}")
     return set([s for s in splitted if s in DIAGRAM])
 
-
-
-print(f"p1: {p1()}")
-
-print("-------")
-# print(count_paths(START))
-
-
-
-
-def explore_paths2(start: tuple):
-    q = [start]
-    tot = 0
-
-    while q:
-        curr = q.pop(0)
-        # print(f"curr: {curr}")
-        if curr[0] >= OUT:
-            tot +=1
-        if curr in DIAGRAM:
-            q.append((curr[0]+2, curr[1]-1))
-            q.append((curr[0]+2, curr[1]+1))
-        elif curr[0]+2 <= OUT:
-            q.append((curr[0]+2, curr[1]))
-    return tot
 
 @cache
 def explore_rec(start: tuple):
@@ -84,5 +58,7 @@ def explore_rec(start: tuple):
     return n
 
 
-# print(f"p2: {explore_paths2(START)}")
-print(f"p2: {explore_rec(START)}")
+
+
+assert p1() == 1630
+assert p2() == 47857642990160
