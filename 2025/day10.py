@@ -1,4 +1,5 @@
 from itertools import product
+from z3 import Optimize, Int, Sum, sat
 
 with open("inputs/input10.txt") as ifile:
     SCHEMAS = ifile.read().splitlines()
@@ -6,11 +7,8 @@ with open("inputs/input10.txt") as ifile:
                for s in SCHEMAS]
     BUTTONS = [[tuple(int(i) for i in b.strip(")(").split(","))
                 for b in s.split()[1:-1]] for s in SCHEMAS]
-    JOLTAGES = [s.split() for s in SCHEMAS]
+    JOLTAGES = [list(map(int, s.split()[-1].strip("}{").split(","))) for s in SCHEMAS]
 
-print(TARGETS)
-print(BUTTONS)
-# print(JOLTAGES)
 
 
 def p1():
@@ -23,7 +21,7 @@ def press(button: tuple, machine: list):
 
 
 def generate_combinations(n):
-    return sorted(list(product([0, 1, 2], repeat=n)), key=sum)
+    return sorted(list(product([0, 1], repeat=n)), key=sum)
 
 
 def apply_combination(combination: tuple, buttons: list[tuple], size: int):
@@ -42,4 +40,28 @@ def get_number_of_presses(target: list, buttons: tuple):
             return sum(c)
 
 
-print(f"p1: {p1()}")
+
+def minimize_presses(buttons: list, target: list):
+    opt = Optimize()
+    x = [Int(f'x{i}') for i in range(len(buttons))]
+
+    for xi in x:
+        opt.add(xi >=0)
+
+    for i, t in enumerate(target):
+        coefficients = [int(i in bt) for bt in buttons] #1 if in button else 0
+        opt.add(Sum(c*xi for c,xi in zip(coefficients, x)) == t)
+
+    opt.minimize(Sum(x))
+
+    if opt.check() == sat:
+        m = opt.model()
+        return sum(m[xi].as_long() for xi in x)
+
+def p2():
+    return sum(minimize_presses(bs, ts) for bs, ts in zip(BUTTONS, JOLTAGES))
+
+
+assert p1() == 415
+assert p2() == 16663
+
